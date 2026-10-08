@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>數學遊戲：位置猜猜猜 v8.3</title>
+    <title>數學遊戲：位置猜猜猜 v8.4</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
         :root { 
@@ -40,7 +40,7 @@
             padding: 10px;
         }
 
-        /* 遊戲主容器：使用 vmin/vmax 鎖定比例，確保不論 iPad 直橫向或電腦都不超出螢幕，且不需要 Scroll */
+        /* 遊戲主容器：預設基礎樣式（適用於直向） */
         .game-container { 
             position: relative; 
             width: 95vw; 
@@ -57,6 +57,7 @@
             flex-direction: column; 
             padding: 1.5vmin; 
             overflow: hidden;
+            transition: all 0.3s ease; /* 旋轉時提供平滑的過渡效果 */
         }
 
         .info-panel { text-align: center; flex-shrink: 0; }
@@ -105,8 +106,16 @@
             width: 100%;
         }
 
-        /* 預設橫向佈局 (電腦 / iPad 橫向) */
+        /* ========================================== */
+        /* ★ 橫向佈局優化 (電腦 / iPad 橫向) ★       */
+        /* 縮小寬度至 80vw，高度至 85vh，使其比例精緻  */
+        /* ========================================== */
         @media (orientation: landscape) {
+            .game-container {
+                width: 80vw;
+                height: 85vh;
+                padding: 2vh;
+            }
             .content-area {
                 flex-direction: row;
                 align-items: stretch;
@@ -120,6 +129,10 @@
                 height: 100%;
                 flex-direction: column;
             }
+            /* 橫向時文字與狀態列字體微調，維持和諧比例 */
+            h1 { font-size: 3vh; }
+            .status-bar { font-size: 2.1vh; padding: 0.4vh; }
+            .instruction-area { font-size: 2.6vh; min-height: 4vh; }
         }
 
         /* 預設直向佈局 (iPad 直向 / 手機) */
@@ -191,7 +204,7 @@
         .emoji.dragging { opacity: 0.5; cursor: grabbing; }
         .emoji.immobile { cursor: not-allowed; }
 
-        /* 統一所有覆蓋介面的背景圖與毛玻璃遮罩 */
+        /* 所有覆蓋介面的背景圖與毛玻璃遮罩 */
         .game-overlay, .feedback-overlay, .level-alert-overlay { 
             position: fixed; 
             top: 0; 
@@ -273,7 +286,7 @@
         }
         .game-button:hover { opacity: 0.9; transform: translateY(-1px); }
 
-        /* 登入介面專用版面：上表單、下排行榜 */
+        /* 登入介面專用版面 */
         .login-layout {
             display: flex;
             flex-direction: column;
@@ -314,7 +327,7 @@
             background: #fff;
         }
 
-        /* 縮小登入排行榜的容器高度，使其適應平板與電腦直橫向 */
+        /* 縮小登入排行榜的容器高度 */
         #login-leaderboard-container {
             width: 100%;
             height: 48vh; 
@@ -444,7 +457,7 @@
     </div>
 
     <script>
-    // --- 版本 8.3 (跨平台極限自適應 + 登入介面排行榜整合版) ---
+    // --- 版本 8.4 (橫向比例優化 + 跨平台自適應版) ---
     const IS_DEBUG_MODE = true; 
     const playerRank = document.getElementById('player-rank');
     const feedbackOverlay = document.getElementById('feedback-overlay');
@@ -1040,11 +1053,10 @@
         return (data ? JSON.parse(data) : []).sort((a, b) => b.score - a.score); 
     }
 
-    // 更新排行榜數據（雙向合流更新：登入頁面 & 結算頁面）
+    // 更新排行榜數據
     function displayLeaderboard() { 
         const leaderboard = getLeaderboard(); 
         
-        // 渲染結算排行榜
         let html = '<table class="leaderboard"><thead><tr><th>排名</th><th>班別</th><th>學號 / 姓名</th><th>最高分數</th><th>挑選次數</th></tr></thead><tbody>'; 
         let currentPlayerRank = -1; 
         
@@ -1073,15 +1085,12 @@
             playerRank.textContent = ''; 
         } 
 
-        // 同步刷新登入頁面的即時排行榜
         initLoginScreenLeaderboard();
     }
 
     function replayGame() { 
         playSound('click'); 
         endScreen.classList.add('hidden'); 
-        
-        // 刷新登入頁並重新載入
         initLoginScreenLeaderboard();
         loginScreen.classList.remove('hidden'); 
     }
