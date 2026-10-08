@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>數學遊戲：位置猜猜猜 v8.4</title>
+    <title>數學遊戲：位置猜猜猜 v8.7</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght=400;700&display=swap');
         :root { 
-            --bg-image: url('my_background.jpg'); /* 統一背景圖定義 */
+            --bg-image: url('my_background.jpg'); /* 統一背景圖 */
             --cabin-frame-color: #8B4513; 
             --cabin-inner-color: #F5DEB3; 
             --button-color: #5CB85C; 
@@ -40,7 +40,7 @@
             padding: 10px;
         }
 
-        /* 遊戲主容器：預設基礎樣式（適用於直向） */
+        /* 遊戲主容器 */
         .game-container { 
             position: relative; 
             width: 95vw; 
@@ -57,7 +57,6 @@
             flex-direction: column; 
             padding: 1.5vmin; 
             overflow: hidden;
-            transition: all 0.3s ease; /* 旋轉時提供平滑的過渡效果 */
         }
 
         .info-panel { text-align: center; flex-shrink: 0; }
@@ -85,17 +84,18 @@
             border-radius: 0.5rem;
         }
         
+        /* 預設指令區大字體樣式（適用於直向） */
         .instruction-area { 
-            font-size: 2.8vh; 
+            font-size: 3.5vh; 
             font-weight: bold; 
             padding: 0.2vh; 
             margin-bottom: 0.5vh; 
             display: flex; 
             justify-content: center; 
             align-items: center; 
-            min-height: 4.5vh;
+            min-height: 5.5vh;
         }
-        .instruction-area .emoji { font-size: 1.2em; vertical-align: middle; margin: 0 0.5rem; }
+        .instruction-area .emoji { font-size: 1.3em; vertical-align: middle; margin: 0 0.5rem; }
         
         /* 核心自適應內容區 */
         .content-area { 
@@ -106,10 +106,9 @@
             width: 100%;
         }
 
-        /* ========================================== */
-        /* ★ 橫向佈局優化 (電腦 / iPad 橫向) ★       */
-        /* 縮小寬度至 80vw，高度至 85vh，使其比例精緻  */
-        /* ========================================== */
+        /* ==================================================== */
+        /* ★ 橫向佈局極致優化：強制放大指令字體 + 再縮小櫃子 ★ */
+        /* ==================================================== */
         @media (orientation: landscape) {
             .game-container {
                 width: 80vw;
@@ -120,22 +119,32 @@
                 flex-direction: row;
                 align-items: stretch;
             }
+            
+            /* 極致縮小小屋櫃子在橫向時的寬度，縮短拖曳物理距離 */
             .game-grid {
-                width: 75%;
+                width: 58%; /* 再縮小至 58% */
                 height: 100%;
             }
             .draggable-object-area {
-                width: 25%;
+                width: 42%; /* 擴大拖曳緩衝區 */
                 height: 100%;
                 flex-direction: column;
             }
-            /* 橫向時文字與狀態列字體微調，維持和諧比例 */
-            h1 { font-size: 3vh; }
-            .status-bar { font-size: 2.1vh; padding: 0.4vh; }
-            .instruction-area { font-size: 2.6vh; min-height: 4vh; }
+            
+            h1 { font-size: 2.8vh; }
+            .status-bar { font-size: 2vh; padding: 0.4vh; }
+            
+            /* ★ 強制覆蓋放大：橫向時「A在B左面」字體放大至與直向一樣大 (3.6vh)，Emoji 放大至 1.3em ★ */
+            body .instruction-area { 
+                font-size: 3.6vh !important; 
+                min-height: 5.5vh !important; 
+            }
+            body .instruction-area .emoji {
+                font-size: 1.3em !important;
+            }
         }
 
-        /* 預設直向佈局 (iPad 直向 / 手機) */
+        /* 預設直向佈局 (iPad 直向) */
         @media (orientation: portrait) {
             .content-area {
                 flex-direction: column;
@@ -169,7 +178,7 @@
             display: flex; 
             justify-content: center; 
             align-items: center; 
-            font-size: 5.5vh; /* 根據網格高度自動縮放 Emoji */
+            font-size: 5.5vh; 
             position: relative;
         }
         
@@ -196,7 +205,7 @@
             background-color: #FFF8E1; 
         }
         #draggable-emoji-container .emoji { 
-            font-size: 7vh; /* 根據拖曳區高度自適應大小 */
+            font-size: 7vh; 
             line-height: 1; 
         }
         
@@ -204,7 +213,7 @@
         .emoji.dragging { opacity: 0.5; cursor: grabbing; }
         .emoji.immobile { cursor: not-allowed; }
 
-        /* 所有覆蓋介面的背景圖與毛玻璃遮罩 */
+        /* 覆蓋介面 */
         .game-overlay, .feedback-overlay, .level-alert-overlay { 
             position: fixed; 
             top: 0; 
@@ -327,7 +336,6 @@
             background: #fff;
         }
 
-        /* 縮小登入排行榜的容器高度 */
         #login-leaderboard-container {
             width: 100%;
             height: 48vh; 
@@ -338,7 +346,6 @@
             margin-top: 1vh;
         }
 
-        /* 結算排行容器 */
         #leaderboard-container { 
             width: 100%; 
             max-width: 650px; 
@@ -457,7 +464,7 @@
     </div>
 
     <script>
-    // --- 版本 8.4 (橫向比例優化 + 跨平台自適應版) ---
+    // --- 版本 8.7 (橫向大字小櫃完美修復版) ---
     const IS_DEBUG_MODE = true; 
     const playerRank = document.getElementById('player-rank');
     const feedbackOverlay = document.getElementById('feedback-overlay');
@@ -492,7 +499,6 @@
     let score = 0, timer = TOTAL_TIME, timerInterval, currentUser = null; 
     let questionCounter = 0;
 
-    // 自適應難度狀態
     let currentLevel = 1; 
     let consecutiveCorrect = 0; 
     let consecutiveWrong = 0;   
@@ -510,7 +516,6 @@
     let initialX = 0, initialY = 0;
     let currentQuestionData = null;
 
-    // 初始化登入頁面的排行榜
     function initLoginScreenLeaderboard() {
         const leaderboard = getLeaderboard(); 
         let html = '<table class="leaderboard"><thead><tr><th>排名</th><th>班別</th><th>學號 / 姓名</th><th>最高分數</th><th>挑選次數</th></tr></thead><tbody>'; 
@@ -533,7 +538,6 @@
         loginLeaderboardContainer.innerHTML = html;
     }
 
-    // 動態更新「學號 / 姓名」下拉選單
     function handleClassSelectionChange() {
         const selectedClass = classSelect.value;
         studentIdSelect.innerHTML = '<option value="">請選擇...</option>';
@@ -642,7 +646,6 @@
         } 
     }
 
-    // Level 1: 基本主動句 (1-2 干擾項)
     function generateLevel1Question() {
         const types = ['above', 'below', 'left', 'right'];
         const qType = types[Math.floor(Math.random() * types.length)];
@@ -687,7 +690,6 @@
         draggableContainer.appendChild(createDraggableEmoji(subjectEmoji, qType));
     }
 
-    // Level 2: 混合倒裝句 (3-4 干擾項)
     function generateLevel2Question() {
         const types = ['above', 'below', 'left', 'right'];
         const qType = types[Math.floor(Math.random() * types.length)];
@@ -738,7 +740,6 @@
         draggableContainer.appendChild(createDraggableEmoji(subjectEmoji, qType));
     }
 
-    // Level 3: 雙重幾何線索題型 (★大幅增加錯誤空格★)
     function generateLevel3Question() {
         let [subjectEmoji, anchor1Emoji, anchor2Emoji] = getRandomItems(TARGET_EMOJIS, 3);
         
@@ -746,7 +747,6 @@
         const solCol = Math.floor(Math.random() * GRID_COLS);
         const solutionIndex = solRow * GRID_COLS + solCol;
 
-        // 決定橫向關係 (左右)
         let hType, anchor1Col;
         if (solCol === 0) {
             hType = 'left'; 
@@ -768,7 +768,6 @@
         }
         const anchor1Index = solRow * GRID_COLS + anchor1Col;
 
-        // 決定縱向關係 (上下)
         let vType, anchor2Row;
         if (solRow === 0) {
             vType = 'above'; 
@@ -818,7 +817,6 @@
         draggableContainer.appendChild(createDraggableEmoji(subjectEmoji, 'dual_condition'));
     }
 
-    // 「之間」題目
     function generateBetweenQuestion() { 
         let [subjectEmoji, anchorEmoji1, anchorEmoji2] = getRandomItems(TARGET_EMOJIS, 3); 
         const possibleTriplets = []; 
@@ -1053,7 +1051,6 @@
         return (data ? JSON.parse(data) : []).sort((a, b) => b.score - a.score); 
     }
 
-    // 更新排行榜數據
     function displayLeaderboard() { 
         const leaderboard = getLeaderboard(); 
         
@@ -1095,7 +1092,6 @@
         loginScreen.classList.remove('hidden'); 
     }
 
-    // 觸控與拖曳
     function handleDragStart(e) { 
         if (isChecking) { e.preventDefault(); return; } 
         draggedElement = e.target; 
@@ -1174,7 +1170,6 @@
         } 
     }
 
-    // 初始化與事件綁定
     document.addEventListener('DOMContentLoaded', () => {
         handleClassSelectionChange();
         initLoginScreenLeaderboard();
